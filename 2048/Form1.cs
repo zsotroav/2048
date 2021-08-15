@@ -241,22 +241,6 @@ namespace _2048
                     GameState[0, 0] = 0;
                     UpdDisp(0, 0);
                     break;
-                case Keys.NumPad1:
-                    GameState = new int[4, 4]
-                    {
-                        {0,32,32,32},
-                        {0,0,32,32},
-                        {32,32,32,32},
-                        {0,0,0,32}
-                    };
-                    for (int i = 0; i < 4; i++)
-                    {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            UpdDisp(i, j);
-                        }
-                    }
-                    break;
                 case Keys.Left:
                     MvLU(0, 1);
                     break;
