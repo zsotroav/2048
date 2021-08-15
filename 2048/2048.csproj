@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>_2048</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Authors>zsotroav</Authors>
+    <Company>zsotroav</Company>
+    <Product>Not quite 2048</Product>
+    <Description>A crappy 2048 copy</Description>
+    <Copyright>zsotroav 2021, All rights reserved.</Copyright>
+  </PropertyGroup>
+
+</Project>
