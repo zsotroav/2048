@@ -46,6 +46,7 @@ namespace _2048
         public bool[,] GameFreePrev = new bool[4, 4];
 
         public int Score = 0;
+        public int ScorePrev = 0;
         
         public Form1()
         {
@@ -55,8 +56,7 @@ namespace _2048
 
         private void Init(object sender, EventArgs e)
         {
-            Score = 0;
-            LScore.Text = "Score: 0";
+            Scoring(0, true);
             LHScore.Text = $"High score: {HighScore}";
             GameBoard = new Panel[,]
             {
@@ -154,19 +154,20 @@ namespace _2048
 
         private void Backup()
         {
+            ScorePrev = Score;
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
                 {
                     GameStatePrev[i,j] = GameState[i,j];
                     GameFreePrev[i,j] = GameFree[i,j];
-
                 }
             }
         }
 
         private void Restore(object sender, EventArgs e)
         {
+            Scoring(ScorePrev, true);
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -178,21 +179,22 @@ namespace _2048
             }
         }
 
-        private void Scoring(int Points)
+        private void Scoring(int points, bool hard)
         {
-            Score += Points;
+            if (hard)
+                Score = points;
+            else
+                Score += points;
             LScore.Text = $"Score: {Score}";
+
             if (Score > HighScore)
-            {
-                LHScore.Text = $"High score: {Score}";
                 HighScore = Score;
-            }
         }
 
         public static readonly string WritePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         public static readonly string DirPath = Path.Combine(WritePath, "zsotroav", "2048");
         public static readonly string MainPath = Path.Combine(DirPath, "HighScore.bin");
-        private static int HighScore
+        private int HighScore
         {
             get
             {
@@ -212,6 +214,7 @@ namespace _2048
             }
             set
             {
+                LHScore.Text = $"High score: {value}";
                 using StreamWriter sw = new(MainPath);
                 sw.WriteLine(value);
                 sw.Close();
@@ -302,7 +305,7 @@ namespace _2048
 
                         helper[i - x2, j - y2] = true;
                         GameState[i - x2, j - y2] *= 2;
-                        Scoring(GameState[i - x2, j - y2]);
+                        Scoring(GameState[i - x2, j - y2], false);
                         UpdDisp(i - x2, j - y2);
                         GameState[i, j] = 0;
                         UpdDisp(i, j);
@@ -381,7 +384,7 @@ namespace _2048
 
                         helper[i + x2, j + y2] = true;
                         GameState[i + x2, j + y2] *= 2;
-                        Scoring(GameState[i + x2, j + y2]);
+                        Scoring(GameState[i + x2, j + y2], false);
                         UpdDisp(i + x2, j + y2);
                         GameState[i, j] = 0;
                         UpdDisp(i, j);
