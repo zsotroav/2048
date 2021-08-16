@@ -9,6 +9,7 @@ A not quite perfect and a bit quirky 2048 ripoff that can operate alone as just 
 
 ## Table of Contents <!-- omit in toc -->
 
+- [Compiling](#compiling)
 - [UI](#ui)
   - [Reference implementation](#reference-implementation)
   - [Configurability](#configurability)
@@ -18,6 +19,20 @@ A not quite perfect and a bit quirky 2048 ripoff that can operate alone as just 
   - [Engine methods](#engine-methods)
   - [Engine variables](#engine-variables)
   - [GameControls enum](#gamecontrols-enum)
+
+## Compiling
+
+Compiling the project with the reference Windows Form UI
+
+Requirements:
+- [.NET SDK 5.x.x](https://dotnet.microsoft.com/download)
+- [.NET Desktop Runtime 5.x.x](https://dotnet.microsoft.com/download) (_if compiled without self containment_)
+
+Compile to run with the .NET Desktop Runtime 5.x.x (_output size: ~150KB_): **RECOMMENDED**
+>`dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained false`
+
+Compile to run without the .NET Desktop Runtime 5.x.x (_output size: ~300MB_):
+>`dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained true`
 
 ## UI
 
