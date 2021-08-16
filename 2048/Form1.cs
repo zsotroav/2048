@@ -57,14 +57,14 @@ namespace _2048
         
         private void Init()
         {
-            GameBoard = new Panel[,]
+            GameBoard = new[,]
             {
                 { PA1, PB1, PC1, PD1},
                 { PA2, PB2, PC2, PD2},
                 { PA3, PB3, PC3, PD3},
                 { PA4, PB4, PC4, PD4}
             };
-            GameLabels = new Label[,]
+            GameLabels = new[,]
             {
                 { LA1, LB1, LC1, LD1},
                 { LA2, LB2, LC2, LD2},
@@ -129,9 +129,9 @@ namespace _2048
             Init();
         }
 
-        private void GenErr()
+        private static void GenErr()
         {
-            MessageBox.Show("Game over! You ran out of free spaces.", "Game over", MessageBoxButtons.OK,
+            MessageBox.Show(@"Game over! You ran out of free spaces.", @"Game over", MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
     }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace _2048
+﻿namespace _2048
 {
-    class Movement
+    internal class Movement
     {
         public delegate void UpdSDel(int score, bool hard);
         public static event UpdSDel Score;
