@@ -86,19 +86,19 @@ namespace _2048
             LHScore.Text = $@"High score: {score}";
         }
 
-        private void UpdDisp(int x, int y)
+        private void UpdDisp(int x, int y, int value)
         {
             Color col;
-            col = Colors.TryGetValue(Game.State[x, y], out col) ? col : ColorPlus;
+            col = Colors.TryGetValue(value, out col) ? col : ColorPlus;
             GameBoard[x, y].BackColor = col;
             
-            if (Game.State[x, y] == 0)
+            if (value == 0)
             {
                 GameLabels[x, y].Text = "";
             }
             else
             {
-                GameLabels[x, y].Text = Game.State[x, y].ToString();
+                GameLabels[x, y].Text = value.ToString();
 
                 if (GameLabels[x, y].Text.Length > 4)
                     GameLabels[x, y].Font = new Font("Microsoft Sans Serif", 9F,

@@ -6,7 +6,7 @@ namespace _2048
 {
     public class GameInstance
     {
-        public delegate void UpdDispDel(int x, int y);
+        public delegate void UpdDispDel(int x, int y, int value);
         public event UpdDispDel UpdDisp;
 
         public delegate void UpdSDel(int score);
@@ -29,7 +29,7 @@ namespace _2048
                 for (int j = 0; j < 4; j++)
                 {
                     State[i, j] = 0;
-                    UpdDisp?.Invoke(i, j);
+                    UpdDisp?.Invoke(i, j, State[i,j]);
                 }
             }
 
@@ -74,7 +74,7 @@ namespace _2048
             else
                 State[x, y] = 2;
 
-            UpdDisp?.Invoke(x, y);
+            UpdDisp?.Invoke(x, y, State[x,y]);
         }
 
         public void Move(Keys key)
@@ -89,13 +89,13 @@ namespace _2048
                         for (int j = 0; j < 4; j++)
                         {
                             State[i, j] = (int)Math.Pow(2, t);
-                            UpdDisp?.Invoke(i, j);
+                            UpdDisp?.Invoke(i, j, State[i,j]);
                             t++;
                         }
                     }
 
                     State[0, 0] = 0;
-                    UpdDisp?.Invoke(0, 0);
+                    UpdDisp?.Invoke(0, 0, 0);
                     break;
                 case Keys.Left:
                     State = Movement.MvLu(0, 1, State);
@@ -127,7 +127,7 @@ namespace _2048
                 for (int y = 0; y < 4; y++)
                 {
                     if (State[x, y] != StatePrev[x,y])
-                        UpdDisp?.Invoke(x, y);
+                        UpdDisp?.Invoke(x, y, State[x,y]);
                 }
             }
         }
@@ -152,7 +152,7 @@ namespace _2048
                 for (int j = 0; j < 4; j++)
                 {
                     State[i, j] = StatePrev[i, j];
-                    UpdDisp?.Invoke(i, j);
+                    UpdDisp?.Invoke(i, j, State[i,j]);
                 }
             }
         }
