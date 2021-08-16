@@ -523,7 +523,7 @@ namespace _2048
             this.label1.TabIndex = 23;
             this.label1.Text = "Undo";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label1.Click += new System.EventHandler(this.Restore);
+            this.label1.Click += new System.EventHandler(Undo);
             // 
             // panel3
             // 
@@ -549,7 +549,7 @@ namespace _2048
             this.label4.TabIndex = 24;
             this.label4.Text = "New game";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label4.Click += new System.EventHandler(this.Init);
+            this.label4.Click += new System.EventHandler(NewGame);
             // 
             // label3
             // 

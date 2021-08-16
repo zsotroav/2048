@@ -15,6 +15,8 @@ namespace _2048
 {
     public partial class Form1 : Form
     {
+        public GameInstance Game = new();
+
         public readonly Dictionary<int,Color> Colors = new()
         {
             { 0, Color.FromArgb(204, 192, 178) },
@@ -39,25 +41,19 @@ namespace _2048
         public Panel[,] GameBoard;
         public Label[,] GameLabels;
 
-        public int[,] GameState = new int[4, 4];
-        public int[,] GameStatePrev = new int[4, 4];
-
-        public bool[,] GameFree = new bool[4, 4];
-        public bool[,] GameFreePrev = new bool[4, 4];
-
-        public int Score = 0;
-        public int ScorePrev = 0;
-        
         public Form1()
         {
             InitializeComponent();
-            Init(null, null);
-        }
 
-        private void Init(object sender, EventArgs e)
+            Game.UpdDisp += UpdDisp;
+            Game.UpdScore += Score;
+            Game.UpdHS += HScore;
+
+            Init();
+        }
+        
+        private void Init()
         {
-            Scoring(0, true);
-            LHScore.Text = $"High score: {HighScore}";
             GameBoard = new Panel[,]
             {
                 { PA1, PB1, PC1, PD1},
@@ -73,75 +69,36 @@ namespace _2048
                 { LA4, LB4, LC4, LD4}
             };
             
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    GameState[i, j] = 0;
-                    UpdDisp(i, j);
-                }
-            }
-            Generate();
-
-        }
-
-        private void Generate()
-        {
-            bool ok = false;
-            for (int i = 0; i < 4 && !ok; i++)
-            {
-                for (int j = 0; j < 4 && !ok; j++)
-                {
-                    if (GameFree[i, j])
-                        ok = true;
-                }
-            }
-
-            if (!ok)
-            {
-                MessageBox.Show("Game over! You ran out of free spaces.", "Game over", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            Random R = new();
-            bool work = true;
-            int x = -1;
-            int y = -1;
-            while (work)
-            {
-                x = R.Next(0, 4);
-                y = R.Next(0, 4);
-                work = !GameFree[x, y];
-            }
-
-            if (R.Next(0, 10) == 0)
-                GameState[x, y] = 4;
-            else
-                GameState[x, y] = 2;
-
-            UpdDisp(x, y);
+            Game.Reset();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
         }
 
+        private void Score(int score)
+        {
+            LScore.Text = $@"Score: {score}";
+        }
+
+        private void HScore(int score)
+        {
+            LHScore.Text = $@"High score: {score}";
+        }
+
         private void UpdDisp(int x, int y)
         {
             Color col;
-            col = Colors.TryGetValue(GameState[x, y], out col) ? col : ColorPlus;
+            col = Colors.TryGetValue(Game.State[x, y], out col) ? col : ColorPlus;
             GameBoard[x, y].BackColor = col;
             
-            if (GameState[x, y] == 0)
+            if (Game.State[x, y] == 0)
             {
                 GameLabels[x, y].Text = "";
-                GameFree[x, y] = true;
             }
             else
             {
-                GameLabels[x, y].Text = GameState[x, y].ToString();
-                GameFree[x, y] = false;
+                GameLabels[x, y].Text = Game.State[x, y].ToString();
 
                 if (GameLabels[x, y].Text.Length > 4)
                     GameLabels[x, y].Font = new Font("Microsoft Sans Serif", 9F,
@@ -152,264 +109,19 @@ namespace _2048
             }
         }
 
-        private void Backup()
-        {
-            ScorePrev = Score;
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    GameStatePrev[i,j] = GameState[i,j];
-                    GameFreePrev[i,j] = GameFree[i,j];
-                }
-            }
-        }
-
-        private void Restore(object sender, EventArgs e)
-        {
-            Scoring(ScorePrev, true);
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    GameState[i, j] = GameStatePrev[i, j];
-                    GameFree[i, j] = GameFreePrev[i, j];
-                    UpdDisp(i, j);
-                }
-            }
-        }
-
-        private void Scoring(int points, bool hard)
-        {
-            if (hard)
-                Score = points;
-            else
-                Score += points;
-            LScore.Text = $"Score: {Score}";
-
-            if (Score > HighScore)
-                HighScore = Score;
-        }
-
-        public static readonly string WritePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        public static readonly string DirPath = Path.Combine(WritePath, "zsotroav", "2048");
-        public static readonly string MainPath = Path.Combine(DirPath, "HighScore.bin");
-        private int HighScore
-        {
-            get
-            {
-                if (File.Exists(MainPath))
-                {
-                    using StreamReader sr = new(MainPath);
-                    int re = int.Parse(sr.ReadLine() ?? "0");
-                    sr.Close();
-                    return re;
-                }
-                else
-                {
-                    Directory.CreateDirectory(DirPath);
-                    File.Create(MainPath).Close();
-                    return 0;
-                }
-            }
-            set
-            {
-                LHScore.Text = $"High score: {value}";
-                using StreamWriter sw = new(MainPath);
-                sw.WriteLine(value);
-                sw.Close();
-            }
-        }
-
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            Backup();
-            switch (e.KeyData)
-            {
-                case Keys.NumPad0:
-                    int t = 0;
-                    for (int i = 0; i < 4; i++)
-                    {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            GameState[i, j] = (int)Math.Pow(2, t);
-                            UpdDisp(i, j);
-                            t++;
-                        }
-                    }
-
-                    GameState[0, 0] = 0;
-                    UpdDisp(0, 0);
-                    break;
-                case Keys.Left:
-                    MvLU(0, 1);
-                    break;
-                case Keys.Up:
-                    MvLU(1, 0);
-                    break;
-                case Keys.Down:
-                    MvRD(1, 0);
-                    break;
-                case Keys.Right:
-                    MvRD(0, 1);
-                    break;
-            }
+            Game.Move(e.KeyData);
         }
 
-        private void MvLU(int x, int y)
+        private void Undo(object sender, EventArgs e)
         {
-            var helper = new bool[4, 4];
-            for (int i = 3; i - x >= 0; i--)        // Row
-            {
-                for (int j = 3; j - y >= 0; j--)    // Column
-                { 
-                    if (GameState[i, j] != 0 && GameState[i - x, j - y] == 0)
-                    {
-                        GameState[i - x, j - y] = GameState[i, j];
-                        UpdDisp(i - x, j - y);
-                        GameState[i, j] = 0;
-                        UpdDisp(i, j);
-                    } else if (GameState[i, j] == GameState[i - x, j - y] && GameState[i, j] != 0 && !helper[i, j])
-                    {
-                        int x2 = x;
-                        int y2 = y;
-                        if (((i - 2 * x == 1 && x != 0) || (j - 2 * y == 1 && y != 0)) &&
-                            GameState[i - 2 * x, j - 2 * y] == GameState[i, j] &&
-                            GameState[i - 3 * x, j - 3 * y] != GameState[i, j])
-                        {
-                            x2 *= 2;
-                            y2 *= 2;
-                        }
-                        else if (((i - 2 * x == 0 && x != 0) || (j - 2 * y == 0 && y != 0)) &&
-                                 GameState[i - 2 * x, j - 2 * y] == GameState[i, j])
-                        {
-                            x2 *= 2;
-                            y2 *= 2;
-                        }
-
-                        helper[i - x2, j - y2] = true;
-                        GameState[i - x2, j - y2] *= 2;
-                        Scoring(GameState[i - x2, j - y2], false);
-                        UpdDisp(i - x2, j - y2);
-                        GameState[i, j] = 0;
-                        UpdDisp(i, j);
-                    }
-
-                    if (x == 1 && i < 3 && GameState[i + x, j] != 0 && GameState[i, j] == 0)
-                    {
-                        GameState[i, j] = GameState[i + x, j];
-                        UpdDisp(i,j);
-                        GameState[i + x, j] = 0;
-                        UpdDisp(i + x, j);
-                    }
-                    if (y == 1 && j < 3 && GameState[i, j + y] != 0 && GameState[i,j] == 0)
-                    {
-                        GameState[i, j] = GameState[i, j + y];
-                        UpdDisp(i,j);
-                        GameState[i, j + y] = 0;
-                        UpdDisp(i, j + y);
-                    }
-                }
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (x == 1 && GameState[3, i] != 0 && GameState[2, i] == 0) // UP
-                {
-                    GameState[2, i] = GameState[3, i];
-                    UpdDisp(2, i);
-                    GameState[3, i] = 0;
-                    UpdDisp(3, i);
-                }
-                if (y == 1 && GameState[i, 3] != 0 && GameState[i, 2] == 0) // LEFT
-                {
-                    GameState[i, 2] = GameState[i, 3];
-                    UpdDisp(i, 2);
-                    GameState[i, 3] = 0;
-                    UpdDisp(i, 3);
-                }
-            }
-
-            Generate();
+            Game.Restore();
         }
 
-
-        private void MvRD(int x, int y)
+        private void NewGame(object sender, EventArgs e)
         {
-            bool[,] helper = new bool[4, 4];
-            for (int i = 0; i + x <= 3; i++)        // Row
-            {
-                for (int j = 0; j + y <= 3; j++)    // Column
-                {
-                    if (GameState[i, j] != 0 && GameState[i + x, j + y] == 0)
-                    {
-                        GameState[i + x, j + y] = GameState[i, j];
-                        UpdDisp(i + x, j + y);
-                        GameState[i, j] = 0;
-                        UpdDisp(i, j);
-                    }
-                    else if (GameState[i, j] == GameState[i + x, j + y] && GameState[i, j] != 0 && !helper[i, j])
-                    {
-                        int x2 = x;
-                        int y2 = y;
-                        if (((i + 2 * x == 2 && x != 0) || (j + 2 * y == 2 && y != 0)) &&
-                            GameState[i + 2 * x, j + 2 * y] == GameState[i, j] &&
-                            GameState[i + 3 * x, j + 3 * y] != GameState[i, j])
-                        {
-                            x2 *= 2;
-                            y2 *= 2;
-                        }
-                        else if (((i + 2 * x == 3 && x != 0) || (j + 2 * y == 3 && y != 0)) &&
-                                 GameState[i + 2 * x, j + 2 * y] == GameState[i, j])
-                        {
-                            x2 *= 2;
-                            y2 *= 2;
-                        }
-
-                        helper[i + x2, j + y2] = true;
-                        GameState[i + x2, j + y2] *= 2;
-                        Scoring(GameState[i + x2, j + y2], false);
-                        UpdDisp(i + x2, j + y2);
-                        GameState[i, j] = 0;
-                        UpdDisp(i, j);
-                    }
-
-                    if (x == 1 && i > 1 && GameState[i - x, j] != 0 && GameState[i,j] == 0)
-                    {
-                        GameState[i, j] = GameState[i - x, j];
-                        UpdDisp(i, j);
-                        GameState[i - x, j] = 0;
-                        UpdDisp(i - x, j);
-                    }
-                    if (y == 1 && j > 1 && GameState[i, j - y] != 0 && GameState[i,j] == 0)
-                    {
-                        GameState[i, j] = GameState[i, j - y];
-                        UpdDisp(i, j);
-                        GameState[i, j - y] = 0;
-                        UpdDisp(i, j - y);
-                    }
-                }
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (x == 1 && GameState[0, i] != 0 && GameState[1, i] == 0) // DOWN
-                {
-                    GameState[1, i] = GameState[0, i];
-                    UpdDisp(1, i);
-                    GameState[0, i] = 0;
-                    UpdDisp(0, i);
-                }
-                if (y == 1 && GameState[i, 0] != 0 && GameState[i, 1] == 0) // RIGHT
-                {
-                    GameState[i, 1] = GameState[i, 0];
-                    UpdDisp(i, 1);
-                    GameState[i, 0] = 0;
-                    UpdDisp(i, 0);
-                }
-            }
-
-            Generate();
+            Init();
         }
     }
 }
