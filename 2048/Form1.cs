@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Formats.Asn1;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace _2048
@@ -36,6 +28,16 @@ namespace _2048
             { 16384, Color.FromArgb(84, 168, 2) },
             { 32768, Color.FromArgb(72, 144, 2) }
         };
+
+        public readonly Dictionary<Keys, GameControls> ControlsMap = new()
+        {
+            {Keys.Up, GameControls.Up},
+            {Keys.Down, GameControls.Down},
+            {Keys.Left, GameControls.Left},
+            {Keys.Right, GameControls.Right},
+            {Keys.NumPad0, GameControls.Debug}
+        };
+
         public readonly Color ColorPlus = Color.FromArgb(89, 137, 247);
 
         public Panel[,] GameBoard;
@@ -48,6 +50,7 @@ namespace _2048
             Game.UpdDisp += UpdDisp;
             Game.UpdScore += Score;
             Game.UpdHS += HScore;
+            Game.GenErr += GenErr;
 
             Init();
         }
@@ -111,7 +114,9 @@ namespace _2048
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            Game.Move(e.KeyData);
+            GameControls cont;
+            cont = ControlsMap.TryGetValue(e.KeyData, out cont) ? cont : GameControls.Invalid;
+            Game.Move(cont);
         }
 
         private void Undo(object sender, EventArgs e)
@@ -122,6 +127,12 @@ namespace _2048
         private void NewGame(object sender, EventArgs e)
         {
             Init();
+        }
+
+        private void GenErr()
+        {
+            MessageBox.Show("Game over! You ran out of free spaces.", "Game over", MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Windows.Forms;
 
 namespace _2048
 {
@@ -14,6 +13,9 @@ namespace _2048
 
         public delegate void UpdHSDel(int score);
         public event UpdHSDel UpdHS;
+
+        public delegate void GenErrDel();
+        public event GenErrDel GenErr;
 
         public int Score;
         public int ScorePrev;
@@ -53,8 +55,7 @@ namespace _2048
 
             if (!ok)
             {
-                MessageBox.Show("Game over! You ran out of free spaces.", "Game over", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                GenErr?.Invoke();
                 return;
             }
 
@@ -77,12 +78,12 @@ namespace _2048
             UpdDisp?.Invoke(x, y, State[x,y]);
         }
 
-        public void Move(Keys key)
+        public void Move(GameControls key)
         {
             Backup();
             switch (key)
             {
-                case Keys.NumPad0:
+                case GameControls.Debug:
                     int t = 0;
                     for (int i = 0; i < 4; i++)
                     {
@@ -97,22 +98,22 @@ namespace _2048
                     State[0, 0] = 0;
                     UpdDisp?.Invoke(0, 0, 0);
                     break;
-                case Keys.Left:
+                case GameControls.Left:
                     State = Movement.MvLu(0, 1, State);
                     Updates();
                     Generate();
                     break;
-                case Keys.Up:
+                case GameControls.Up:
                     State = Movement.MvLu(1, 0, State);
                     Updates();
                     Generate();
                     break;
-                case Keys.Down:
+                case GameControls.Down:
                     State = Movement.MvRd(1, 0, State);
                     Updates();
                     Generate();
                     break;
-                case Keys.Right:
+                case GameControls.Right:
                     State = Movement.MvRd(0, 1, State);
                     Updates();
                     Generate();
