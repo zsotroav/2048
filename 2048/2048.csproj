@@ -8,8 +8,10 @@
     <Authors>zsotroav</Authors>
     <Company>zsotroav</Company>
     <Product>Not quite 2048</Product>
-    <Description>A crappy 2048 copy</Description>
+    <Description>A not quite perfect and a bit quirky 2048 ripoff.</Description>
     <Copyright>zsotroav 2021, All rights reserved.</Copyright>
+    <RepositoryUrl>https://github.com/zsotroav/2048</RepositoryUrl>
+    <RepositoryType>Git - GitHub</RepositoryType>
   </PropertyGroup>
 
 </Project>
