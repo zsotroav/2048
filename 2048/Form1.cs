@@ -7,8 +7,10 @@ namespace _2048
 {
     public partial class Form1 : Form
     {
+        // Get a GameInstance
         public GameInstance Game = new();
 
+        // Set UI colors
         public readonly Dictionary<int,Color> Colors = new()
         {
             { 0, Color.FromArgb(204, 192, 178) },
@@ -28,7 +30,9 @@ namespace _2048
             { 16384, Color.FromArgb(84, 168, 2) },
             { 32768, Color.FromArgb(72, 144, 2) }
         };
+        public readonly Color ColorPlus = Color.FromArgb(89, 137, 247);
 
+        // Set controls
         public readonly Dictionary<Keys, GameControls> ControlsMap = new()
         {
             {Keys.Up, GameControls.Up},
@@ -38,8 +42,6 @@ namespace _2048
             {Keys.NumPad0, GameControls.Debug}
         };
 
-        public readonly Color ColorPlus = Color.FromArgb(89, 137, 247);
-
         public Panel[,] GameBoard;
         public Label[,] GameLabels;
 
@@ -47,6 +49,7 @@ namespace _2048
         {
             InitializeComponent();
 
+            // Subscribe to Display update events
             Game.UpdDisp += UpdDisp;
             Game.UpdScore += Score;
             Game.UpdHS += HScore;
@@ -57,6 +60,7 @@ namespace _2048
         
         private void Init()
         {
+            // Make a matrix of the Panels and Labels for easy management
             GameBoard = new[,]
             {
                 { PA1, PB1, PC1, PD1},
@@ -72,11 +76,8 @@ namespace _2048
                 { LA4, LB4, LC4, LD4}
             };
             
+            // Reset the game 
             Game.Reset();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
         }
 
         private void Score(int score)
@@ -103,6 +104,7 @@ namespace _2048
             {
                 GameLabels[x, y].Text = value.ToString();
 
+                // Dynamically set fonts
                 if (GameLabels[x, y].Text.Length > 4)
                     GameLabels[x, y].Font = new Font("Microsoft Sans Serif", 9F,
                         FontStyle.Bold, GraphicsUnit.Point);

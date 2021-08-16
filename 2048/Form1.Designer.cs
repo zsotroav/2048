@@ -613,7 +613,6 @@ namespace _2048
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Not quite 2048 by zsotroav";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.PA1.ResumeLayout(false);
             this.PA2.ResumeLayout(false);
